@@ -8,11 +8,12 @@
 import scrapy
 
 
-class BabelSpiderFeedItem(scrapy.Item):
+class BabelSpiderItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
     url = scrapy.Field()
     category_id = scrapy.Field()
     media_id = scrapy.Field()
+    title = scrapy.Field()
+    content = scrapy.Field()
     published_at = scrapy.Field()
     pass
