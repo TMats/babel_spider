@@ -19,7 +19,7 @@ class BabelSpiderPipeline(object):
         try:
             if type(item) is BabelSpiderItem:
                 sql="""
-                        INSERT INTO staging_articles
+                        INSERT INTO articles
                             (url, category_id, media_id, title, content, published_at)
                         VALUES
                             (%s, %s, %s, %s, %s, %s)
