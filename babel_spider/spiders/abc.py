@@ -6,7 +6,7 @@ from babel_spider.items import BabelSpiderItem
 
 class AbcSpider(XMLFeedSpider):
     name = 'abc'
-    allowed_domains = ['abcnews.com']
+    allowed_domains = ['abcnews.com', 'abcnews.go.com']
     # TODO: fix hardcoding
     start_urls = ['http://feeds.abcnews.com/abcnews/internationalheadlines']
     iterator = 'iternodes'
@@ -26,11 +26,9 @@ class AbcSpider(XMLFeedSpider):
 
     def content_parse(self, response):
         item = response.meta['item']
-        print(response)
         title = response.xpath('//header[@class="article-header"]/h1/text()').extract_first()
-        print(title)
-        content = ''.join(response.xpath('//p[@itemprop="articleBody"]/text()').extract())
-        print(content)
+        content = ''.join(response.xpath('//p[@itemprop="articleBody"]/text() | //p[@itemprop="articleBody"]/a/text()').extract())
         item['title'] = title
         item['content'] = content
-        yield item
+        if title and content:
+            yield item
