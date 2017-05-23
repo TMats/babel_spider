@@ -1,1 +1,4 @@
 settings.py
+.idea
+*.pyc
+.python-version
