@@ -18,8 +18,8 @@ class ShinkasyaSpider(XMLFeedSpider):
         item['url'] = url
         item['category_id'] = 1
         item['media_id'] = 4
-        # item['published_at'] = selector.xpath('text()').extract_first()
-        item['published_at'] = None
+        item['published_at'] = selector.xpath('text()').extract()[1]
+        # item['published_at'] = None
         request = scrapy.Request(url, callback=self.content_parse)
         request.meta['item'] = item
         yield request
