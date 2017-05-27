@@ -2,6 +2,7 @@
 import scrapy
 from scrapy.spiders import XMLFeedSpider
 from babel_spider.items import BabelSpiderItem
+from datetime import datetime
 
 
 class ShinkasyaSpider(XMLFeedSpider):
@@ -18,7 +19,7 @@ class ShinkasyaSpider(XMLFeedSpider):
         item['url'] = url
         item['category_id'] = 1
         item['media_id'] = 4
-        item['published_at'] = selector.xpath('text()').extract()[1]
+        item['published_at'] = datetime.strptime(selector.xpath('text()').extract()[1], '%a,%d-%b-%Y %H:%M:%S %Z')
         # item['published_at'] = None
         request = scrapy.Request(url, callback=self.content_parse)
         request.meta['item'] = item
