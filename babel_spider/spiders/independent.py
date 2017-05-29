@@ -5,16 +5,16 @@ from babel_spider.items import BabelSpiderItem
 from babel_spider.queries import get_urls_by_media_id
 
 
-class ReutersSpider(XMLFeedSpider):
-    name = 'reuters'
-    allowed_domains = ['reuters.com']
+class IndependentSpider(XMLFeedSpider):
+    name = 'independent'
+    allowed_domains = ['independent.co.uk']
     # TODO: fix hardcoding
-    start_urls = ['http://feeds.reuters.com/Reuters/worldNews?format=xml']
+    start_urls = ['http://www.independent.co.uk/news/world/rss']
     iterator = 'iternodes'
     itertag = 'item'
-    media_id = 6
+    media_id = 11
     urls_in_db = get_urls_by_media_id(media_id)
-
+    
     def parse_node(self, response, selector):
         url = selector.xpath('link/text()').extract_first()
         if url not in self.urls_in_db:
@@ -28,11 +28,11 @@ class ReutersSpider(XMLFeedSpider):
             yield request
         else:
             print('skipped:' + url)
-
+    
     def content_parse(self, response):
         item = response.meta['item']
-        title = response.xpath('//h1[@class="article-headline"]/text()').extract_first()
-        content = ''.join(response.xpath('//span[@id="article-text"]/p/text()').extract())
+        title = response.xpath('//h1[@itemprop="headline"]/text()').extract_first()
+        content = ''.join(response.xpath('//div[@itemprop="articleBody"]/p/text() | //div[@itemprop="articleBody"]/p/a/text()').extract())
         item['title'] = title
         item['content'] = content
         if title and content:

@@ -3,24 +3,21 @@ from babel_spider.settings import STATIC_SETTEINGS
 
 
 # Maybe this is no longer needed
-def get_new_articles(media_id):
+def get_urls_by_media_id(media_id):
     connection = psycopg2.connect(host='localhost', database='babel', user='babel', password=STATIC_SETTEINGS['password'])
     cursor = connection.cursor()
     sql = """
         SELECT
-            articles.id,
             articles.url
         FROM
             articles
-        LEFT JOIN
-            contents
-        ON
-            articles.id = contents.article_id
         WHERE
             articles.media_id = {}
-            AND contents.content IS NULL
         """.format(str(media_id))
-    # print(sql)
-    cursor.execute(sql)
-    query_result = dict(cursor.fetchall())
-    return query_result
+    try:
+        cursor.execute(sql)
+        query_results = cursor.fetchall()
+    except psycopg2.DatabaseError as e:
+        connection.rollback()
+    query_results = [result[0] for result in query_results]
+    return query_results

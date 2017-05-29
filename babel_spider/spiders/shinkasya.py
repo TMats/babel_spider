@@ -2,6 +2,7 @@
 import scrapy
 from scrapy.spiders import XMLFeedSpider
 from babel_spider.items import BabelSpiderItem
+from babel_spider.queries import get_urls_by_media_id
 from datetime import datetime
 
 
@@ -12,18 +13,22 @@ class ShinkasyaSpider(XMLFeedSpider):
     start_urls = ['http://www.xinhuanet.com/world/news_world.xml']
     iterator = 'iternodes'
     itertag = 'item'
+    media_id = 4
+    urls_in_db = get_urls_by_media_id(media_id)
 
     def parse_node(self, response, selector):
-        item = BabelSpiderItem()
         url = selector.xpath('link/text()').extract_first()
-        item['url'] = url
-        item['category_id'] = 1
-        item['media_id'] = 4
-        item['published_at'] = datetime.strptime(selector.xpath('text()').extract()[1], '%a,%d-%b-%Y %H:%M:%S %Z')
-        # item['published_at'] = None
-        request = scrapy.Request(url, callback=self.content_parse)
-        request.meta['item'] = item
-        yield request
+        if url not in self.urls_in_db:
+            item = BabelSpiderItem()
+            item['url'] = url
+            item['category_id'] = 1
+            item['media_id'] = self.media_id
+            item['published_at'] = datetime.strptime(selector.xpath('text()').extract()[1], '%a,%d-%b-%Y %H:%M:%S %Z')
+            request = scrapy.Request(url, callback=self.content_parse)
+            request.meta['item'] = item
+            yield request
+        else:
+            print('skipped:' + url)
 
     def content_parse(self, response):
         item = response.meta['item']
