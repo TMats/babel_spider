@@ -29,4 +29,5 @@ class BabelSpiderPipeline(object):
             self.cursor.fetchall()
         except psycopg2.DatabaseError as e:
             print("Error: %s" % e)
+            self.connection.rollback()
         return item
