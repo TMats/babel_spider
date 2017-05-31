@@ -2,7 +2,11 @@
 import scrapy
 from scrapy.spiders import XMLFeedSpider
 from babel_spider.items import BabelSpiderItem
-from babel_spider.queries import get_urls_by_media_id
+from babel_spider.queries import get_urls_by_media_id, serch_null_image_urls, update_image_url
+import requests
+from urllib.parse import urljoin
+from bs4 import BeautifulSoup
+from time import sleep
 
 
 class NhkSpider(XMLFeedSpider):
@@ -37,3 +41,19 @@ class NhkSpider(XMLFeedSpider):
         item['content'] = content
         if title and content:
             yield item
+
+    @classmethod
+    def insert_image_urls(cls):
+        query_results = serch_null_image_urls(cls.media_id)
+        for article_id, url in query_results:
+            print(url)
+            try:
+                r = requests.get(url)
+                if r.status_code == 200:
+                    soup = BeautifulSoup(r.text.encode(r.encoding), 'html.parser')
+                    img = soup.find('div', id='news_image_div').find('img')
+                    image_url = urljoin(r.url, img['src'])
+                    print(image_url)
+                    update_image_url(article_id, image_url)
+            except Exception as e:
+                print(e)
