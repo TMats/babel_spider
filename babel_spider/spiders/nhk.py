@@ -6,7 +6,6 @@ from babel_spider.queries import get_urls_by_media_id, serch_null_image_urls, up
 import requests
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-from time import sleep
 
 
 class NhkSpider(XMLFeedSpider):
